@@ -22,9 +22,9 @@ export async function getList(url, listName) {
   return response;
 }
 
-export function updateOne(url, item) {
+export async function updateOne(url, item) {
   url = BASE_URL + url;
-  axios
+  await axios
     .put(url, item)
     .then((res) => {
       console.log(res);
@@ -36,7 +36,7 @@ export function updateOne(url, item) {
 
 export async function deleteOne(url, param) {
   url = BASE_URL + url;
-  // bookmark: @RequestParam
+  // NOTE: @RequestParam
   await axios
     .delete(url, { params: param })
     .then((res) => {

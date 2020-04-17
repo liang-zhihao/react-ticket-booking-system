@@ -52,7 +52,7 @@ class AdminTable extends Component {
   componentWillMount() {
     this.createAdminCols();
   }
-  // bookmark: async function return a Promise!!!
+  // NOTE: async function return a Promise!!!
   createAdminCols = async () => {
     const { url, listName } = this.props;
     let list = [];

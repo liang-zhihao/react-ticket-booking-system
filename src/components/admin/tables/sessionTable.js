@@ -10,8 +10,11 @@ import "rsuite-table/dist/css/rsuite-table.css";
 import { getList, updateOne, deleteOne, createOne } from "utils/apiRequest";
 import { EditTable, EditCell, CheckCell } from "./editTable";
 import DatePicker from "react-datepicker";
+import { useState } from "react";
 
 import "react-datepicker/dist/react-datepicker.css";
+
+
 class SessionTable extends Component {
   static defaultProps = {
     url: "/session",
@@ -25,12 +28,13 @@ class SessionTable extends Component {
       roomName: "Room",
       status: "Status",
     },
+
     listName: "list",
-    tableHeader: "Film Manage",
+    tableHeader: "Session Manage",
     // ------------------------
     // Modal Form content ()
     // ------------------------
-    modalHeader: "Add a new film",
+    modalHeader: "Add a new session",
     labelNames: [
       "Cinema",
       "Film",
@@ -67,35 +71,56 @@ class SessionTable extends Component {
   componentWillMount() {
     this.createAdminCols();
   }
-  onDropdownChange = (id, selectedObj) => {
+  /**
+   * @param  {int} id : row data id
+   * @param  { r } selectedObj
+   */
+
+  onDropdownChange = async (id, selectedObj) => {
     const { url } = this.props;
-    console.log(id);
     const { list } = this.child.state;
     const { idName } = this.props;
     for (let item of list) {
       if (id === item[idName]) {
         item[selectedObj.dropdownIdName] = selectedObj.dropdownItemId;
-        updateOne(url, item);
+        await updateOne(url, item);
+        this.child.updateTable();
         break;
       }
     }
-    this.child.setState((state, prop) => {
-      return { list: list };
-    });
+
     console.log(list);
   };
+  onDatePickerChange = async (date, id) => {
+    const { url, idName } = this.props;
+    const { list } = this.child.state;
+    for (let item of list) {
+      if (id === item[idName]) {
 
+        item["time"] =date
+        await updateOne(url, item);
+        this.child.updateTable();
+        break;
+      }
+    }
+
+    console.log(list);
+  };
   createAdminCols = async () => {
     const { url, listName, dataToLabel, idName } = this.props;
     let list = [];
     await getList(url, listName).then((myList) => {
       list = myList;
     });
+    /**  
+    
+    */
     for (let item of list) {
       item["cinemaName"] = item["film"]["name"];
       item["filmName"] = item["cinema"]["name"];
       item["roomName"] = item["room"]["roomName"];
     }
+    console.log("--------");
     console.log(list);
     let items = [],
       count = 0;
@@ -139,7 +164,7 @@ class SessionTable extends Component {
       if (key === "cinemaName" || key === "filmName" || key === "roomName") {
         dropdownInfo["list"] = dropdownList;
         items.push(
-          <Column key={count} width={100} sort="true" resizable align="center">
+          <Column key={count} width={100} sort="true" flexGrow align="center">
             <HeaderCell>{dataToLabel[key]}</HeaderCell>
             <DropdownCell
               idName={idName}
@@ -155,13 +180,11 @@ class SessionTable extends Component {
         items.push(
           <Column key={count} width={100} sort="true" resizable align="center">
             <HeaderCell>{dataToLabel[key]}</HeaderCell>
-            <Cell
+            <DatePickerCell
               idName={idName}
               dataKey={key}
-              onChange={this.child.handleChange}>
-            
-              <DatePicker ></DatePicker>{" "}
-            </Cell>
+              onChange={this.onDatePickerChange}
+            ></DatePickerCell>
           </Column>
         );
       } else {
@@ -175,15 +198,15 @@ class SessionTable extends Component {
             />
           </Column>
         );
-      }      
+      }
     }
     this.setState({ items });
-    console.log(items);
+
     return null;
   };
   render() {
     let { items } = this.state;
-    console.log(items);
+
     return (
       <EditTable
         {...this.props}
@@ -215,7 +238,7 @@ const DropdownCell = ({
     };
     options.push(opt);
   }
-  console.info(dataKey + "----------------");
+
   return (
     <Cell {...props}>
       <Modal
@@ -253,58 +276,17 @@ const DropdownCell = ({
   );
 };
 
-const DateCell = ({
-  rowData,
-  dataKey,
-  onChange,
-  idName,
-  dropdownInfo,
-  onOpen,
-  onClose,
-  ...props
-}) => {
+const DatePickerCell = ({ rowData, dataKey, onChange, idName, ...props }) => {
+  const [date, setNewDate] = useState();
   // must deliver  dataKey, IdKey, onChange like IdKey="adminId" onChange={this.handleChange} dataKey="password"
-  let options = [];
-  for (let item of dropdownInfo["list"]) {
-    let opt = {
-      key: item[dropdownInfo["idName"]],
-      text: item[dropdownInfo["value"]],
-      value: item[dropdownInfo["value"]],
-    };
-    options.push(opt);
-  }
-  console.info(dataKey + "----------------");
+
   return (
     <Cell {...props}>
-      <Modal
-        trigger={
-          <Button
-            content={rowData[dropdownInfo["tableName"]][dropdownInfo["value"]]}
-          />
-        }
-      >
-        <Dropdown
-          fluid
-          selection
-          search
-          options={options}
-          onChange={(e, data) => {
-            let dropdownItemId = -1;
-            for (let opt of options) {
-              if (opt["value"] === data.value) {
-                dropdownItemId = opt["key"];
-                break;
-              }
-            }
-            const obj = {
-              dropdownItemId: dropdownItemId,
-              dropdownIdName: dropdownInfo["idName"],
-            };
-            onChange(rowData[idName], obj);
-          }}
-          placeholder={
-            rowData[dropdownInfo["tableName"]][dropdownInfo["value"]]
-          }
+      <Modal trigger={<Button content={rowData[dataKey]} />}>
+        <MyDatePicker
+          date={rowData[dataKey]}
+          itemId={rowData[idName]}
+          onChange={onChange}
         />
       </Modal>
     </Cell>
@@ -312,3 +294,45 @@ const DateCell = ({
 };
 
 export default SessionTable;
+const MyDatePicker = ({ date, itemId, onChange, ...props }) => {
+  const [startDate, setStartDate] = useState(new Date(date));
+
+  return (
+    <DatePicker
+      selected={startDate}
+      onChange={(date) => {
+        setStartDate(date);
+       
+  
+
+
+        onChange(dateFormat("YYYY-mm-dd HH:MM",date), itemId);
+      }}
+      showTimeSelect
+      timeFormat="HH:mm"
+      timeIntervals={15}
+      timeCaption="time"
+      dateFormat="MMMM d, yyyy h:mm aa"
+    />
+  );
+};
+
+function dateFormat(fmt, date) {
+  let ret;
+  const opt = {
+      "Y+": date.getFullYear().toString(),        // 年
+      "m+": (date.getMonth() + 1).toString(),     // 月
+      "d+": date.getDate().toString(),            // 日
+      "H+": date.getHours().toString(),           // 时
+      "M+": date.getMinutes().toString(),         // 分
+      "S+": date.getSeconds().toString()          // 秒
+      // 有其他格式化字符需求可以继续添加，必须转化成字符串
+  };
+  for (let k in opt) {
+      ret = new RegExp("(" + k + ")").exec(fmt);
+      if (ret) {
+          fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+      };
+  };
+  return fmt;
+}

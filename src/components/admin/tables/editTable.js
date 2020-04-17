@@ -23,17 +23,29 @@ import "rsuite-table/dist/css/rsuite-table.css";
 import schema from "async-validator";
 import ModalForm from "components/admin/tables/modalForm";
 import { Rules } from "utils/validatorRules";
-
+/**
+ *
+ *
+ * @export
+ * @class EditTable
+ * @extends {Component}
+ */
 export class EditTable extends Component {
   static defaultProps = {};
   state = {
     list: [],
     checkedAll: false,
-    rowHeight:50,
+    rowHeight: 50,
   };
   static propTypes = {
     cols: PropTypes.array,
   };
+
+  /**
+   * get list form back-end
+   *
+   * @memberof EditTable
+   */
   updateTable = async () => {
     const { url, listName } = this.props;
     await getList(url, listName).then((list) => {
@@ -41,6 +53,12 @@ export class EditTable extends Component {
       console.log(list);
     });
   };
+  /**
+    deliver to 'this' father node
+ * initialize the table
+ *
+ * @memberof EditTable
+ */
   componentWillMount() {
     this.props.onRef(this);
     this.updateTable();
@@ -60,11 +78,15 @@ export class EditTable extends Component {
     }
     this.setState({ list });
   };
-
+  /**
+   * connect to the delete button
+   *
+   * @memberof EditTable
+   */
   handleDelete = (dataKey, id) => {
     const { url } = this.props;
     const param = { [dataKey]: id };
-    // bookmark: @Requestparam
+    // NOTE: @Requestparam
     deleteOne(url, param).then((res) => {
       this.updateTable();
     });
@@ -95,7 +117,7 @@ export class EditTable extends Component {
       }
     }
 
-    // bookmark: @Requestparam
+    // NOTE : @Requestparam
 
     this.updateTable();
   };
@@ -103,7 +125,7 @@ export class EditTable extends Component {
   render() {
     const { list, checkedAll } = this.state;
     const { idName, colNames, tableHeader, tableColumns } = this.props;
-    const {rowHeight}=this.state
+    const { rowHeight } = this.state;
     // if(list[0]["isStudent"]!==null){
     //   console.info(list[0].isStudent)
     // }
@@ -140,9 +162,16 @@ export class EditTable extends Component {
           />
         </Menu>
 
-        <Table data={list} autoHeight virtualized bordered defaultExpandAllRows rowHeight={rowHeight} >
+        <Table
+          data={list}
+          autoHeight
+          virtualized
+          bordered
+          defaultExpandAllRows
+          rowHeight={rowHeight}
+        >
           {/* checkbox columns */}
-          <Column width={50}  align="center"  fixed>
+          <Column width={50} align="center" fixed>
             <HeaderCell></HeaderCell>
             <CheckCell
               dataKey="checked"
@@ -152,7 +181,7 @@ export class EditTable extends Component {
           </Column>
           {/* data columns */}
           {tableColumns}
-          <Column width={100} sort="true" resizable align="center" >
+          <Column width={100} sort="true" resizable align="center">
             <HeaderCell>Edit</HeaderCell>
             <EditActionCell dataKey={idName} onClick={this.handleEdit} />
           </Column>

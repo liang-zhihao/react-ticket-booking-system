@@ -157,6 +157,7 @@ class FilmTable extends Component {
     );
   }
 }
+
 export const DropdownCell = ({
   rowData,
   dataKey,

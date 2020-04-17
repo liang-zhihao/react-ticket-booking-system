@@ -23,7 +23,7 @@ export default class AdminIndex extends Component {
     this.setState({ visible });
   }
   render() {
-    // bookmark the best way to write css in react
+    // NOTE the best way to write css in react
     const { visible } = this.state;
 
     const minHeight = document.body.clientHeight + "px";

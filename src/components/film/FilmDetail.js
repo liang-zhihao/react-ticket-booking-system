@@ -22,7 +22,8 @@ import {
   createOne,
   getOne,
 } from "utils/apiRequest";
-
+import sessionInfo from './sessionInfo'
+import SessionInfo from "./sessionInfo";
 var faker = require("faker");
 
 class FilmDetail extends Component {
@@ -37,6 +38,7 @@ class FilmDetail extends Component {
     poster: "",
     introduction: "",
     status: "",
+    sessionList:[],
   };
   componentWillMount() {
     const id = this.props.match.params.id;
@@ -49,7 +51,8 @@ class FilmDetail extends Component {
   render() {
     const { filmData } = this.state;
     const filmContent = [];
-    console.log(filmData);
+    const {sessionList}=filmData
+    console.log(filmData)
     if (
       filmData.duration === 0 ||
       filmData.duration === undefined ||
@@ -95,16 +98,15 @@ class FilmDetail extends Component {
       // TODO
     // ----------session list-------
     // ----------comment list-------
+    console.log(sessionList)
     return (
       <Grid centered>
         <Grid.Row textAlign="left" columns={2} >
           <Grid.Column width={8} >{filmContent}</Grid.Column>
         </Grid.Row>
+
         <Grid.Row textAlign="left" columns={2} >
-          <Grid.Column width={8} >{filmContent}</Grid.Column>
-        </Grid.Row>
-        <Grid.Row textAlign="left" columns={2} >
-          <Grid.Column width={8} >{filmContent}</Grid.Column>
+          <Grid.Column width={15} > <SessionInfo sessionList={sessionList}/> </Grid.Column>
         </Grid.Row>
       </Grid>
     );

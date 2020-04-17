@@ -33,8 +33,8 @@ export const Rules = {
   }),
   isDuplicate: (url, dataName) => {
     url = BASE_URL + url;
-    //   bookmark: get=>  const params = { params: { [dataName]: value } }
-    //   bookmark: if there are async requests ,you need asyncValidator
+    //   NOTE: get=>  const params = { params: { [dataName]: value } }
+    //   NOTE: if there are async requests ,you need asyncValidator
     return {
       asyncValidator: async (rule, value) => {
         const params = { params: { [dataName]: value } };
