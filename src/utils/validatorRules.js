@@ -1,9 +1,9 @@
 import axios from "axios";
 const BASE_URL = "http://localhost:8090/api";
 export const Rules = {
-  required: (dataName) => ({
+  required: (dataLabel) => ({
     required: true,
-    message: dataName + " is required",
+    message: dataLabel + " is required",
   }),
   isLength: (min, max,dataName) => ({
     min: min,

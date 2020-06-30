@@ -2,18 +2,12 @@ import React, { Component } from "react";
 import axios from "axios";
 import { Provider, connect } from "react-redux";
 import { Link, Switch, Route, NavLink, Redirect } from "react-router-dom";
-import { getList, updateOne, deleteOne, createOne } from "utils/apiRequest";
+import { getList, updateOne, deleteOne, createOne } from "utils/request";
 import { tableEditAction } from "utils/tableAction";
 import {
-  Grid,
-  Menu,
-  Sidebar,
   Segment,
   Button,
-  Icon,
   Input,
-  Header,
-  Checkbox,
   Modal,
   Form,
   Message,
@@ -22,8 +16,6 @@ import {
 import schema from "async-validator";
 import { Rules } from "utils/validatorRules";
 export default class ModalForm extends Component {
-  static defaultProps = {};
-
   state = {
     errorMessages: {
       display: false,
@@ -31,10 +23,10 @@ export default class ModalForm extends Component {
     },
     confirm: false,
   };
+  // TODO: use select to 
   //   use async method to make sure wait createOne func and update table
   handleSubmit = () => {
     const { dataNames, url, descriptor } = this.props;
-
     const obj = {};
     let validator = new schema(descriptor);
     dataNames.forEach((name) => {

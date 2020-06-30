@@ -1,30 +1,31 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
-import axios from "axios";
-import { Provider, connect } from "react-redux";
-import { Link, Switch, Route, NavLink, Redirect } from "react-router-dom";
-import { getList, updateOne, deleteOne, createOne } from "utils/apiRequest";
-import { tableEditAction } from "utils/tableAction";
-import {
-  Grid,
-  Menu,
-  Sidebar,
-  Segment,
-  Button,
-  Icon,
-  Input,
-  Header,
-  Checkbox,
-  Modal,
-  Form,
-} from "semantic-ui-react";
 import { Column, HeaderCell, Cell } from "rsuite-table";
 import "rsuite-table/dist/css/rsuite-table.css";
 import { Rules } from "utils/validatorRules";
-import { EditTable, EditCell } from "./editTable";
+import EditCell from "components/table/components/EditCell";
+import EditTable from "components/table/EditTable";
 
 class AdminTable extends Component {
+  
   static defaultProps = {
+    tableHeaders: [
+      {
+        title: "ID",
+        dataKey: "adminId",
+        editable: false,
+      },
+      {
+        title: "Username",
+        dataKey: "username",
+        editable: true,
+      },
+      {
+        title: "Password",
+        dataKey: "password",
+        editable: true,
+      },
+    ],
     url: "/admin",
     idName: "adminId",
     colNames: ["ID", "Username", "Password"],
@@ -33,6 +34,14 @@ class AdminTable extends Component {
     // ------------------------
     // Modal Form content
     // ------------------------
+    ModalFormHeaders: [
+      { title: "Username", dataKey: "username" },
+      {
+        title: "Password",
+        dataKey: "password",
+      },
+    ],
+
     modalHeader: "Add a new admin",
     labelNames: ["Username", "Password"],
     dataNames: ["username", "password"],
@@ -47,70 +56,47 @@ class AdminTable extends Component {
     },
   };
   state = {
-    items: [],
+    columns: [],
   };
-  componentWillMount() {
+  componentDidMount() {
+
     this.createAdminCols();
   }
   // NOTE: async function return a Promise!!!
   createAdminCols = async () => {
-    const { url, listName } = this.props;
-    let list = [];
-    await getList(url, listName).then((myList) => {
-      list = myList;
-    });
+    const { idName, tableHeaders } = this.props;
 
-    const { idName, colNames } = this.props;
-    let tmp = {};
-    if (list != null) {
-      tmp = list[0];
-    }
-
-    let obj = Object.assign({}, tmp);
-    let cols = Object.keys(obj);
-    let items = [];
-    let count = 0;
-    for (let colName of cols) {
-      if (colName === idName) {
-        items.push(
-          <Column
-            key={count}
-            width={100}
-            sort="true"
-            fixed
-            resizable
-            align="center"
-          >
-            <HeaderCell>{colNames[count++]}</HeaderCell>
-            <Cell dataKey={colName} onChange={this.child.handleChange} />
-          </Column>
-        );
-        continue;
-      }
-      if (colName !== "editable" && colName !== "checked") {
-        items.push(
-          <Column key={count} width={100} sort="true" resizable align="center">
-            <HeaderCell>{colNames[count++]}</HeaderCell>
+    let columns = [],
+      index = 0;
+    for (const header of tableHeaders) {
+      columns.push(
+        <Column key={index} width={200} resizable align="center">
+          <HeaderCell>{header["title"]}</HeaderCell>
+          {header["editable"] ? (
             <EditCell
-              dataKey={colName}
-              idName={idName}
+              dataKey={header["dataKey"]}
               onChange={this.child.handleChange}
+              idName={idName}
             />
-          </Column>
-        );
-      }
+          ) : (
+            <Cell
+              dataKey={header["dataKey"]}
+              onChange={this.child.handleChange}
+           
+            />
+          )}
+        </Column>
+      );
     }
-    this.setState({ items });
-    console.log(items);
-    return null;
+    this.setState({ columns });
   };
   render() {
-    let { items } = this.state;
-    console.log(items);
+    let { columns } = this.state;
+    console.log(columns);
     return (
       <EditTable
         {...this.props}
-        tableColumns={items}
+        tableColumns={columns}
         onRef={(ref) => {
           this.child = ref;
         }}
@@ -120,27 +106,3 @@ class AdminTable extends Component {
 }
 
 export default AdminTable;
-
-class adminTable extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  componentWillMount() {}
-
-  componentDidMount() {}
-
-  componentWillReceiveProps(nextProps) {}
-
-  shouldComponentUpdate(nextProps, nextState) {}
-
-  componentWillUpdate(nextProps, nextState) {}
-
-  componentDidUpdate(prevProps, prevState) {}
-
-  componentWillUnmount() {}
-
-  render() {
-    return <div></div>;
-  }
-}

@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import axios from "axios";
 import { Provider, connect } from "react-redux";
 import { Link, Switch, Route, NavLink, Redirect } from "react-router-dom";
-import { getList, updateOne, deleteOne, createOne } from "utils/apiRequest";
+import { getList, updateOne, deleteOne, createOne } from "utils/request";
 import { tableEditAction } from "utils/tableAction";
 import {
   Grid,
@@ -17,12 +17,19 @@ import {
   Checkbox,
   Modal,
   Form,
+  FormField,
+  Label,
 } from "semantic-ui-react";
 import { Table, Column, HeaderCell, Cell } from "rsuite-table";
 import "rsuite-table/dist/css/rsuite-table.css";
 import schema from "async-validator";
-import ModalForm from "components/admin/tables/modalForm";
+import ModalForm from "components/table/components/ModalForm";
 import { Rules } from "utils/validatorRules";
+import EditCell from "components/table/components/EditCell";
+import EditTable from "components/table/EditTable";
+import CheckCell from "components/table/components/CheckCell";
+import DeleteActionCell from "components/table/components/DeleteActionCell";
+import EditActionCell from "components/table/components/EditActionCell";
 /**
  *
  *
@@ -30,7 +37,33 @@ import { Rules } from "utils/validatorRules";
  * @class EditTable
  * @extends {Component}
  */
-export class EditTable extends Component {
+
+/**
+  like this 
+  * static defaultProps = {
+    url: "/admin",
+    idName: "adminId",
+    colNames: ["ID", "Username", "Password"],
+    listName: "list",
+    tableHeader: "Admin Manage",
+    // ------------------------
+    // Modal Form content
+    // ------------------------
+    modalHeader: "Add a new admin",
+    labelNames: ["Username", "Password"],
+    dataNames: ["username", "password"],
+    descriptor: {
+      username: [
+        Rules.required("Username"),
+        Rules.isLength(3, 10, "Username"),
+        Rules.isType(Rules.TYPE.string),
+        Rules.isDuplicate("/admin/username-duplication", "username"),
+      ],
+      password: [Rules.required("password"), Rules.isLength(3, 10)],
+    },
+  };
+  */
+export default class extends Component {
   static defaultProps = {};
   state = {
     list: [],
@@ -47,8 +80,8 @@ export class EditTable extends Component {
    * @memberof EditTable
    */
   updateTable = async () => {
-    const { url, listName } = this.props;
-    await getList(url, listName).then((list) => {
+    const { url } = this.props;
+    await getList(url).then((list) => {
       this.setState({ list });
       console.log(list);
     });
@@ -91,7 +124,7 @@ export class EditTable extends Component {
       this.updateTable();
     });
   };
-
+  handleUpdate = () => {};
   handleCheck = (data, id) => {
     const { list } = this.state;
     const { idName } = this.props;
@@ -183,7 +216,8 @@ export class EditTable extends Component {
           {tableColumns}
           <Column width={100} sort="true" resizable align="center">
             <HeaderCell>Edit</HeaderCell>
-            <EditActionCell dataKey={idName} onClick={this.handleEdit} />
+            {/* <EditActionCell dataKey={idName} onClick={this.handleEdit} /> */}
+            <UModalForm />
           </Column>
           <Column width={100} sort="true" resizable align="center">
             <HeaderCell>Delete</HeaderCell>
@@ -194,106 +228,59 @@ export class EditTable extends Component {
     );
   }
 }
-// TODO: asyn
 
-export const CheckCell = ({ rowData, dataKey, onClick, idName, ...props }) => {
-  // must deliver  dataKey, IdKey, onChange like IdKey="adminId" onChange={this.handleChange} dataKey="password"
-  let checkVal = rowData[dataKey];
-  let editable = null;
+
+const UModalForm = ({ rowData, ...props }) => {
+  const FormField = Form.Field;
+  const [state, setState] = useState({
+    username: "",
+    password: "",
+  });
+  console.log("====================================");
+  console.log(rowData);
+  console.log("====================================");
+  const updateField = e => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.value
+    });
+  };
+  // TODO: finish the reconstrction of ModalForm including update data and create data 
   return (
     <Cell {...props}>
-      <Checkbox
-        checked={checkVal}
-        onClick={(event, data) => {
-          onClick(data, rowData[idName]);
-        }}
-      />
-    </Cell>
-  );
-};
-export const EditCell = ({ rowData, dataKey, onChange, idName, ...props }) => {
-  // must deliver  dataKey, IdKey, onChange like IdKey="adminId" onChange={this.handleChange} dataKey="password"
-  return (
-    <Cell {...props}>
-      {rowData["editable"] === true ? (
-        <Input
-          defaultValue={rowData[dataKey]}
-          onChange={(event) => {
-            onChange(rowData[idName], dataKey, event.target.value);
-          }}
-        />
-      ) : (
-        rowData[dataKey]
-      )}
+      <Modal trigger={<Button>Edit</Button>}>
+        <Form>
+          <FormField>
+            <label>Username</label>
+            <Input placeholder="Username" value={rowData["username"]} onChange={} />
+          </FormField>
+          <Form.Field >
+            <label>Password</label>
+            <Input placeholder="Password" value={rowData["password"]} />
+          </Form.Field>
+          <Button type="submit">Submit</Button>
+        </Form>
+      </Modal>
     </Cell>
   );
 };
 
-const EditActionCell = ({ rowData, dataKey, onClick, ...props }) => {
-  // must deliver like dataKey="adminId" onClick={this.handleEdit}
-  return (
-    <Cell {...props} style={{ padding: "6px 0" }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData[dataKey]);
-        }}
-      >
-        {rowData["editable"] === true ? "Save" : "Edit"}
-      </Button>
-    </Cell>
-  );
-};
-const DeleteActionCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: "6px 0" }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(dataKey, rowData[dataKey]);
-        }}
-      >
-        Delete
-      </Button>
-    </Cell>
-  );
-};
+// class table extends Component {
+//   componentWillMount() {}
 
-class table extends Component {
-  componentWillMount() {}
+//   componentDidMount() {}
 
-  componentDidMount() {}
+//   componentWillReceiveProps(nextProps) {}
 
-  componentWillReceiveProps(nextProps) {}
+//   shouldComponentUpdate(nextProps, nextState) {}
 
-  shouldComponentUpdate(nextProps, nextState) {}
+//   componentWillUpdate(nextProps, nextState) {}
 
-  componentWillUpdate(nextProps, nextState) {}
+//   componentDidUpdate(prevProps, prevState) {}
 
-  componentDidUpdate(prevProps, prevState) {}
+//   componentWillUnmount() {}
 
-  componentWillUnmount() {}
-
-  render() {
-    return <div></div>;
-  }
-}
-
-const setDelay = (millisecond) => {
-  return new Promise((resolve, reject) => {
-    if (typeof millisecond != "number")
-      reject(new Error("参数必须是number类型"));
-    setTimeout(() => {
-      resolve(`我延迟了${millisecond}毫秒后输出的`);
-    }, millisecond);
-  });
-};
-const setDelaySecond = (seconds) => {
-  return new Promise((resolve, reject) => {
-    if (typeof seconds != "number" || seconds > 10)
-      reject(new Error("参数必须是number类型，并且小于等于10"));
-    setTimeout(() => {
-      resolve(`我延迟了${seconds}秒后输出的，注意单位是秒`);
-    }, seconds * 1000);
-  });
-};
+//   render() {
+//     return <div></div>;
+//   }
+// }

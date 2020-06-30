@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import poster from "../../../poster.jpg";
 import axios from "axios";
-import { actions } from "../../../redux/register";
+import { actions } from "../../../redux/user";
 import { Provider, connect } from "react-redux";
 import {
   Button,

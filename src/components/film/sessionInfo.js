@@ -2,15 +2,15 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import axios from "axios";
 import { Provider, connect } from "react-redux";
-import { Link, Switch, Route, NavLink, Redirect } from "react-router-dom";
 import {
-  Grid,
-  Icon,
-  Image,
-
-  List,
-  Item,Button
-} from "semantic-ui-react";
+  Link,
+  Switch,
+  Route,
+  NavLink,
+  Redirect,
+  withRouter,
+} from "react-router-dom";
+import { Grid, Icon, Image, List, Item, Button } from "semantic-ui-react";
 import { getPlaceHolder } from "utils/placeHolder";
 import {
   getList,
@@ -18,10 +18,10 @@ import {
   deleteOne,
   createOne,
   getOne,
-} from "utils/apiRequest";
+} from "utils/request";
 import { Table, Column, HeaderCell, Cell } from "rsuite-table";
 import "rsuite-table/dist/css/rsuite-table.css";
-export default class SessionInfo extends Component {
+class SessionInfo extends Component {
   static defaultProps = {
     url: "/session",
     idName: "sessionId",
@@ -34,7 +34,7 @@ export default class SessionInfo extends Component {
       roomName: "Room",
       status: "Status",
     },
-    // TODO
+    // TODO: decrease the number var as soon as possible
     listName: "list",
   };
   state = {
@@ -46,9 +46,10 @@ export default class SessionInfo extends Component {
     console.log(nextProp.sessionList);
     this.createAdminCols();
   }
-  handleBook=()=>{
-    
-  }
+  handleBook = (id) => {
+    const { history } = this.props;
+    setTimeout(history.push("/session/" + id), 500);
+  };
   createAdminCols = () => {
     const { url, dataToLabel, idName } = this.props;
 
@@ -66,21 +67,33 @@ export default class SessionInfo extends Component {
     cols.push(
       <Column width={100} align="center" flexGrow>
         <HeaderCell>{"Action"}</HeaderCell>
-        <Cell dataKey={idName} idName={idName} >
-          <Button content="Book" onClick={this.handleBook}/>        </Cell>
+        <Cell dataKey={idName} idName={idName}>
+          {(rowData) => {
+            return (
+              <Button
+                content="Book"
+                onClick={() => {
+                  this.handleBook(rowData[idName]);
+                }}
+              />
+            );
+          }}
+        </Cell>
       </Column>
     );
     this.setState({ cols });
   };
   render() {
+    // NOTE: use snippet 'log'
     const { sessionList } = this.props;
     let list = Object.assign([], sessionList);
 
     for (let item of list) {
+      console.log(item);
       item["cinemaName"] = item["cinema"]["name"];
       item["filmName"] = item["film"]["name"];
       item["roomName"] = item["room"]["roomName"];
-      console.log(item);
+     
     }
 
     const { cols } = this.state;
@@ -91,3 +104,5 @@ export default class SessionInfo extends Component {
     );
   }
 }
+
+export default withRouter(SessionInfo);

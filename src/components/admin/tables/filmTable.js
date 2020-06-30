@@ -7,8 +7,9 @@ import { Checkbox, Dropdown, Modal, Button } from "semantic-ui-react";
 import { Rules } from "utils/validatorRules";
 import { Column, HeaderCell, Cell } from "rsuite-table";
 import "rsuite-table/dist/css/rsuite-table.css";
-import { getList, updateOne, deleteOne, createOne } from "utils/apiRequest";
-import { EditTable, EditCell, CheckCell } from "./editTable";
+import { getList, updateOne, deleteOne, createOne } from "utils/request";
+import   EditCell  from "components/table/components/EditCell";
+import  EditTable from "components/table/EditTable";
 
 class FilmTable extends Component {
   static defaultProps = {
@@ -77,7 +78,7 @@ class FilmTable extends Component {
     items: [],
   };
   componentWillMount() {
-    this.createAdminCols();
+    this.createFilmCols();
   }
   onDropdownChange = (id, type) => {
     console.log(id);
@@ -97,7 +98,7 @@ class FilmTable extends Component {
     console.log(list);
   };
   onDropdownClose = (id, type) => {};
-  createAdminCols = async () => {
+  createFilmCols = async () => {
     const { url, listName } = this.props;
     let list = [];
     let typeList = [];

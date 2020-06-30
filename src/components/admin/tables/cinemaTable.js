@@ -7,16 +7,21 @@ import { Checkbox, Dropdown, Modal, Button } from "semantic-ui-react";
 import { Rules } from "utils/validatorRules";
 import { Column, HeaderCell, Cell } from "rsuite-table";
 import "rsuite-table/dist/css/rsuite-table.css";
-import { getList, updateOne, deleteOne, createOne } from "utils/apiRequest";
-import { EditTable, EditCell, CheckCell } from "./editTable";
+import { getList, updateOne, deleteOne, createOne } from "utils/request";
+import EditCell from "components/table/components/EditCell";
+import EditTable from "components/table/EditTable";
 
 class CinemaTable extends Component {
   static defaultProps = {
+    tableHeaders: [
+      { title: "ID", dataKey: "cinemaId", editable: false },
+      { title: "Name", dataKey: "name", editable: true },
+      { title: "Location", dataKey: "cinemaId", editable: true },
+      { title: "Phone No", dataKey: "tel", editable: true },
+    ],
     url: "/cinema",
     idName: "cinemaId",
-    colNames: ["ID", "Name", "Location", "Phone"],
-    listName: "list",
-    tableHeader: "Cinema Manage",
+    tableHeader: "Cinema Manage",    listName: "list",
     // ------------------------
     // Modal Form content ()
     // ------------------------
@@ -32,63 +37,45 @@ class CinemaTable extends Component {
     },
   };
   state = {
-    items: [],
+    columns: [],
   };
-  componentWillMount() {
-    this.createAdminCols();
+  componentDidMount() {
+    this.createCinemaCols();
   }
 
-  createAdminCols = async () => {
-    const { url, listName } = this.props;
-    let list = [];
-
-    await getList(url, listName).then((myList) => {
-      list = myList;
-    });
-
-    const { idName, colNames } = this.props;
-    let tmp = {};
-    if (list != null) {
-      tmp = list[0];
-    }
-
-    let obj = Object.assign({}, tmp);
-    let cols = Object.keys(obj);
-    let items = [];
-    let count = 0;
-    for (let dataName of cols) {
-      if (dataName === idName) {
-        items.push(
-          <Column key={count} width={100} sort="true" resizable align="center">
-            <HeaderCell>{colNames[count++]}</HeaderCell>
-            <Cell dataKey={dataName} onChange={this.child.handleChange} />
-          </Column>
-        );
-        continue;
-      }
-      if (dataName !== "editable" && dataName !== "checked") {
-        items.push(
-          <Column key={count} width={100} sort="true" resizable align="center">
-            <HeaderCell>{colNames[count++]}</HeaderCell>
+  createCinemaCols = () => {
+    const { idName, tableHeaders } = this.props;
+    let columns = [],
+      index = 0;
+    for (const header of tableHeaders) {
+      columns.push(
+        <Column key={index} width={200} resizable align="center">
+          <HeaderCell>{header["title"]}</HeaderCell>
+          {header["editable"] ? (
             <EditCell
-              dataKey={dataName}
-              idName={idName}
+              dataKey={header["dataKey"]}
               onChange={this.child.handleChange}
+              idName={idName}
             />
-          </Column>
-        );
-      }
+          ) : (
+            <Cell
+              dataKey={header["dataKey"]}
+              onChange={this.child.handleChange}
+        
+            />
+          )}
+        </Column>
+      );
     }
-    this.setState({ items });
-    return null;
+    this.setState({ columns });
   };
   render() {
-    let { items } = this.state;
-    console.log(items);
+    let { columns } = this.state;
+    console.log(columns);
     return (
       <EditTable
         {...this.props}
-        tableColumns={items}
+        tableColumns={columns}
         onRef={(ref) => {
           this.child = ref;
         }}

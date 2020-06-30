@@ -13,9 +13,7 @@ import {
   Rating,
   Placeholder,
 } from "semantic-ui-react";
-import login from "../user/login/login";
-import Register from "../user/register/register";
-import { getList, updateOne, deleteOne, createOne } from "utils/apiRequest";
+import { getList, updateOne, deleteOne, createOne } from "utils/request";
 import {getPlaceHolder} from "utils/placeHolder"
 export default class IndexBody extends Component {
   state = {
@@ -25,7 +23,7 @@ export default class IndexBody extends Component {
   componentWillMount() {
     let filmList=[]
     getList("/film").then(list=>{
-        console.log(list)
+        
        filmList=list
        this.setState({ filmList });
     });
@@ -34,9 +32,11 @@ export default class IndexBody extends Component {
   }
   render() {
 
-    const { filmList } = this.state;
+    let { filmList } = this.state;
     const items=[]
-    
+    if(filmList===undefined){
+      filmList=[]
+    }
     filmList.map((data, index) => {
       items.push (
         <Grid.Column textAlign="center">

@@ -1,4 +1,4 @@
-import {getList,updateOne} from 'utils/apiRequest'
+import {getList,updateOne} from 'utils/request'
 export function tableEditAction(id,pThis){
     // console.log(id,pThis,url,listName,idName)
     const { url, idName, listName } = pThis.props;

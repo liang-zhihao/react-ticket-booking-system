@@ -7,11 +7,12 @@ import { Checkbox, Dropdown, Modal, Button } from "semantic-ui-react";
 import { Rules } from "utils/validatorRules";
 import { Column, HeaderCell, Cell } from "rsuite-table";
 import "rsuite-table/dist/css/rsuite-table.css";
-import { getList, updateOne, deleteOne, createOne } from "utils/apiRequest";
-import { EditTable, EditCell, CheckCell } from "./editTable";
+import { getList, updateOne, deleteOne, createOne } from "utils/request";
+import   EditCell  from "components/table/components/EditCell";
+import  EditTable from "components/table/EditTable";
 import DatePicker from "react-datepicker";
 import { useState } from "react";
-
+import {dateFormat} from 'utils/timeFormat';
 import "react-datepicker/dist/react-datepicker.css";
 
 
@@ -69,7 +70,7 @@ class SessionTable extends Component {
     items: [],
   };
   componentWillMount() {
-    this.createAdminCols();
+    this.createSessionCols();
   }
   /**
    * @param  {int} id : row data id
@@ -106,7 +107,7 @@ class SessionTable extends Component {
 
     console.log(list);
   };
-  createAdminCols = async () => {
+  createSessionCols = async () => {
     const { url, listName, dataToLabel, idName } = this.props;
     let list = [];
     await getList(url, listName).then((myList) => {
@@ -302,11 +303,7 @@ const MyDatePicker = ({ date, itemId, onChange, ...props }) => {
       selected={startDate}
       onChange={(date) => {
         setStartDate(date);
-       
-  
-
-
-        onChange(dateFormat("YYYY-mm-dd HH:MM",date), itemId);
+        onChange(dateFormat(date), itemId);
       }}
       showTimeSelect
       timeFormat="HH:mm"
@@ -317,22 +314,3 @@ const MyDatePicker = ({ date, itemId, onChange, ...props }) => {
   );
 };
 
-function dateFormat(fmt, date) {
-  let ret;
-  const opt = {
-      "Y+": date.getFullYear().toString(),        // 年
-      "m+": (date.getMonth() + 1).toString(),     // 月
-      "d+": date.getDate().toString(),            // 日
-      "H+": date.getHours().toString(),           // 时
-      "M+": date.getMinutes().toString(),         // 分
-      "S+": date.getSeconds().toString()          // 秒
-      // 有其他格式化字符需求可以继续添加，必须转化成字符串
-  };
-  for (let k in opt) {
-      ret = new RegExp("(" + k + ")").exec(fmt);
-      if (ret) {
-          fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
-      };
-  };
-  return fmt;
-}

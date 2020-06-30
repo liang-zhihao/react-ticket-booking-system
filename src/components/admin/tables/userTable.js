@@ -7,8 +7,9 @@ import { Checkbox } from "semantic-ui-react";
 import { Rules } from "utils/validatorRules";
 import { Column, HeaderCell, Cell } from "rsuite-table";
 import "rsuite-table/dist/css/rsuite-table.css";
-import { getList, updateOne, deleteOne, createOne } from "utils/apiRequest";
-import { EditTable, EditCell, CheckCell } from "./editTable";
+import { getList, updateOne, deleteOne, createOne } from "utils/request";
+import   EditCell  from "components/table/components/EditCell";
+import  EditTable from "components/table/EditTable";
 
 class UserTable extends Component {
   static defaultProps = {
@@ -61,7 +62,7 @@ class UserTable extends Component {
     isStudent: null,
   };
   componentWillMount() {
-    this.createAdminCols();
+    this.createUserCols();
   }
   handleIsStd = (checked, id) => {
     const { list } = this.child.state;
@@ -80,7 +81,7 @@ class UserTable extends Component {
     this.child.setState({ list });
   };
   // NOTE: async function return a Promise!!!
-  createAdminCols = async () => {
+  createUserCols = async () => {
     const { url, listName } = this.props;
     let list = [];
     await getList(url, listName).then((myList) => {
@@ -92,7 +93,7 @@ class UserTable extends Component {
     if (list != null) {
       tmp = list[0];
     }
-    console.log("asd");
+
     let obj = Object.assign({}, tmp);
     let cols = Object.keys(obj);
     let items = [];

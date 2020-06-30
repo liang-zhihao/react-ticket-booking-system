@@ -16,14 +16,9 @@ import {
 } from "semantic-ui-react";
 import { getPlaceHolder } from "utils/placeHolder";
 import {
-  getList,
-  updateOne,
-  deleteOne,
-  createOne,
   getOne,
-} from "utils/apiRequest";
-import sessionInfo from './sessionInfo'
-import SessionInfo from "./sessionInfo";
+} from "utils/request";
+import SessionInfo from './sessionInfo'
 var faker = require("faker");
 
 class FilmDetail extends Component {
@@ -52,7 +47,7 @@ class FilmDetail extends Component {
     const { filmData } = this.state;
     const filmContent = [];
     const {sessionList}=filmData
-    console.log(filmData)
+
     if (
       filmData.duration === 0 ||
       filmData.duration === undefined ||
@@ -98,7 +93,7 @@ class FilmDetail extends Component {
       // TODO
     // ----------session list-------
     // ----------comment list-------
-    console.log(sessionList)
+    // console.log(sessionList)
     return (
       <Grid centered>
         <Grid.Row textAlign="left" columns={2} >
