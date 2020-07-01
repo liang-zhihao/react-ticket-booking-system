@@ -30,6 +30,7 @@ import EditTable from "components/table/EditTable";
 import CheckCell from "components/table/components/CheckCell";
 import DeleteActionCell from "components/table/components/DeleteActionCell";
 import EditActionCell from "components/table/components/EditActionCell";
+import Api from "utils/api";
 /**
  *
  *
@@ -125,6 +126,7 @@ export default class extends Component {
     });
   };
   handleUpdate = () => {};
+
   handleCheck = (data, id) => {
     const { list } = this.state;
     const { idName } = this.props;
@@ -155,6 +157,57 @@ export default class extends Component {
     this.updateTable();
   };
 
+  get FormProps() {
+    const { Admin } = Api;
+    return {
+      dispatch: async (type, payload) => {
+        switch (type) {
+          case "update":
+            await updateOne(Admin, payload);
+            break;
+          case "create":
+            await createOne(payload);
+            break;
+          default:
+            break;
+        }
+        this.updateTable();
+      },
+      updateTable: this.updateTable,
+      fieldValidate: async (descriptor, dataName, value) => {
+        let validator = new schema(descriptor);
+        return validator
+          .validate({ [dataName]: value })
+          .then(() => {
+            return null;
+          })
+          .catch(({ errors, fields }) => {
+            return {
+              content: fields[dataName][0]["message"],
+              pointing: "below",
+            };
+          });
+      },
+
+      updateField: (e, state, setState) => {
+        console.log("====================================");
+        console.log(setState);
+        console.log("====================================");
+        setState({
+          ...state,
+          [e.target.name]: e.target.value,
+        });
+      },
+      getErrorProp: (dataKey, state) => {
+        return state["errMsg"][dataKey];
+      },
+      updateFormMsg: (dataKey, newMsg, state, setState) => {
+        const msg = state.errMsg;
+        msg[dataKey] = newMsg;
+        setState({ ...state, errMsg: msg });
+      },
+    };
+  }
   render() {
     const { list, checkedAll } = this.state;
     const { idName, colNames, tableHeader, tableColumns } = this.props;
@@ -217,7 +270,7 @@ export default class extends Component {
           <Column width={100} sort="true" resizable align="center">
             <HeaderCell>Edit</HeaderCell>
             {/* <EditActionCell dataKey={idName} onClick={this.handleEdit} /> */}
-            <UModalForm />
+            <AdminFormCell type="update" {...this.FormProps} />
           </Column>
           <Column width={100} sort="true" resizable align="center">
             <HeaderCell>Delete</HeaderCell>
@@ -229,42 +282,127 @@ export default class extends Component {
   }
 }
 
+const AdminFormCell = ({ rowData, type, ...props }) => {
+  // TODO: finish the reconstrction of ModalForm including update data and create data
 
-const UModalForm = ({ rowData, ...props }) => {
-  const FormField = Form.Field;
-  const [state, setState] = useState({
-    username: "",
-    password: "",
-  });
-  console.log("====================================");
-  console.log(rowData);
-  console.log("====================================");
-  const updateField = e => {
-    setState({
-      ...state,
-      [e.target.name]: e.target.value
-    });
-  };
-  // TODO: finish the reconstrction of ModalForm including update data and create data 
   return (
     <Cell {...props}>
       <Modal trigger={<Button>Edit</Button>}>
-        <Form>
-          <FormField>
-            <label>Username</label>
-            <Input placeholder="Username" value={rowData["username"]} onChange={} />
-          </FormField>
-          <Form.Field >
-            <label>Password</label>
-            <Input placeholder="Password" value={rowData["password"]} />
-          </Form.Field>
-          <Button type="submit">Submit</Button>
-        </Form>
+        <AdminForm rowData={rowData} type={type} props={props} />
       </Modal>
     </Cell>
   );
 };
+const AdminForm = ({ rowData, type, props }) => {
+  const FormField = Form.Field;
 
+  const adminId = rowData["adminId"],
+    dispatch = props["dispatch"],
+    updateField = props["updateField"],
+    fieldValidate = props["fieldValidate"],
+    getErrorProp = props["getErrorProp"],
+    updateFormMsg = props["updateFormMsg"];
+
+  const [state, setState] = useState({
+    adminId: adminId,
+    username: rowData["username"],
+    password: rowData["password"],
+    errMsg: {},
+  });
+  // TODO: 继续封装！
+  const usernameField = () => {
+    // const descriptor = {
+    //   username: [Rules.required("username")],
+    // };
+    // const dataKey = "username";
+    // const title = "Username";
+    // const placeholder = "Fuck you";
+    // const initVal = state.username;
+    // const props={}
+
+    const formProps = {
+      descriptor: {
+        username: [Rules.required("username")],
+      },
+      dataKey: "username",
+      title: "Username",
+      placeholder: "Fuck you",
+      initVal: state.username,
+      state,
+      setState,
+    };
+    return (
+      <FormFieldInput methods={props} formProps={formProps} />
+    );
+  };
+  const passwordField = () => {
+    return (
+      <FormField>
+        <label>Password</label>
+        <Input
+          onBlur={() => {
+            // validator
+            //   .validate(state)
+            //   .then(async () => {})
+            //   .catch(({ errors, fields }) => {
+            //     console.log("====================================");
+            //     console.log(errors);
+            //     console.log("====================================");
+            //   });
+          }}
+          name="password"
+          placeholder="Password"
+          value={state.password}
+          onChange={updateField}
+        />
+      </FormField>
+    );
+  };
+
+  return (
+    <Form>
+      {usernameField()}
+
+      <Button
+        type="submit"
+        onClick={() => {
+          dispatch(type, state);
+        }}
+      >
+        Ok
+      </Button>
+    </Form>
+  );
+};
+const FormFieldInput = ({ methods, formProps, ...props }) => {
+  const { getErrorProp, fieldValidate, updateFormMsg, updateField } = methods;
+  const {
+    title,
+    initVal,
+    state,
+    setState,
+    placeholder,
+    dataKey,
+    descriptor,
+  } = formProps;
+  return (
+    <FormField
+      control={Input}
+      label={title}
+      placeholder={placeholder}
+      value={initVal}
+      onChange={(e) => {
+        updateField(e, state, setState);
+      }}
+      name={dataKey}
+      error={getErrorProp(dataKey, state)}
+      onBlur={async (e) => {
+        const newMsg = await fieldValidate(descriptor, dataKey, state[dataKey]);
+        updateFormMsg(dataKey, newMsg, state, setState);
+      }}
+    />
+  );
+};
 // class table extends Component {
 //   componentWillMount() {}
 
