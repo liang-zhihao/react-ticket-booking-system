@@ -1,20 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./components/App";
-import Index from "./components/index/index";
-import * as serviceWorker from "./serviceWorker";
-import Register from "./components/user/register/register";
-import PostList from "./test/postList";
-import { createStore } from "redux";
 import { Provider } from "react-redux";
-import rootReducers from "./redux/rootReducer";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { HashRouter as Router, Route, Switch } from "react-router-dom";
+import { createStore } from "redux";
 import AdminIndex from "./components/admin/adminIndex/adminIndex";
+import Index from "./components/index/index";
+import "./index.css";
+import rootReducers from "./redux/rootReducer";
+import * as serviceWorker from "./serviceWorker";
 
 let store = createStore(rootReducers);
 ReactDOM.render(
-  <BrowserRouter>
+  <Router>
     <Provider store={store}>
       <Switch>
         <Route path="/admin" component={AdminIndex} />
@@ -22,7 +19,7 @@ ReactDOM.render(
         <Route path="/" component={Index} />
       </Switch>
     </Provider>
-  </BrowserRouter>,
+  </Router>,
 
   document.getElementById("root")
 );

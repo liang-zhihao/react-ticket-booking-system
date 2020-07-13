@@ -1,34 +1,13 @@
+import SegmentInfo from "components/public/SegmentInfo";
 import React, { Component } from "react";
-import {
-  Input,
-  Button,
-  Form,
-  FormInput,
-  Grid,
-  Segment,
-  Message,
-  Header,
-  Checkbox,
-  Icon,
-  Confirm,
-} from "semantic-ui-react";
-// import { BrowserRouter as Router,Link } from "react-router-dom";
-import "semantic-ui-css/semantic.min.css";
-import axios from "axios";
-import { Provider, connect } from "react-redux";
-import { Link } from "react-router-dom";
+import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { actions } from "redux/user";
-import PropTypes from "prop-types";
-import SegmentInfo from "components/public/SegmentInfo";
+// import { BrowserRouter as Router,Link } from "react-router-dom";
+import "semantic-ui-css/semantic.min.css";
+import { Button, Checkbox, Confirm, Grid, Segment } from "semantic-ui-react";
+import { getOne, updateOne } from "utils/request";
 import { getUserByToken, setTokenNull } from "utils/token";
-import {
-  getList,
-  updateOne,
-  deleteOne,
-  createOne,
-  getOne,
-} from "utils/request";
 const styleMeta = {
   // font:"#5f5447"
   color: "#5f6368",

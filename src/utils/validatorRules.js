@@ -1,5 +1,6 @@
 import axios from "axios";
-const BASE_URL = "http://localhost:8090/api";
+import {BASE_URL} from "utils/request"
+
 export const Rules = {
   required: (dataLabel) => ({
     required: true,

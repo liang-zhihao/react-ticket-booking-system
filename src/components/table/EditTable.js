@@ -1,36 +1,12 @@
-import PropTypes from "prop-types";
-import React, { Component, useState } from "react";
-import axios from "axios";
-import { Provider, connect } from "react-redux";
-import { Link, Switch, Route, NavLink, Redirect } from "react-router-dom";
-import { getList, updateOne, deleteOne, createOne } from "utils/request";
-import { tableEditAction } from "utils/tableAction";
-import {
-  Grid,
-  Menu,
-  Sidebar,
-  Segment,
-  Button,
-  Icon,
-  Input,
-  Header,
-  Checkbox,
-  Modal,
-  Form,
-  FormField,
-  Label,
-} from "semantic-ui-react";
-import { Table, Column, HeaderCell, Cell } from "rsuite-table";
-import "rsuite-table/dist/css/rsuite-table.css";
-import schema from "async-validator";
-import ModalForm from "components/table/components/ModalForm";
-import { Rules } from "utils/validatorRules";
-import EditCell from "components/table/components/EditCell";
-import EditTable from "components/table/EditTable";
+import oldFormProps from "components/base/form/formProps";
 import CheckCell from "components/table/components/CheckCell";
 import DeleteActionCell from "components/table/components/DeleteActionCell";
-import EditActionCell from "components/table/components/EditActionCell";
-import Api from "utils/api";
+import PropTypes from "prop-types";
+import React, { Component } from "react";
+import { Cell, Column, HeaderCell, Table } from "rsuite-table";
+import "rsuite-table/dist/css/rsuite-table.css";
+import { Button, Header, Menu, Modal, Segment } from "semantic-ui-react";
+import { createOne, deleteOne, getList, updateOne } from "utils/request";
 /**
  *
  *
@@ -39,31 +15,6 @@ import Api from "utils/api";
  * @extends {Component}
  */
 
-/**
-  like this 
-  * static defaultProps = {
-    url: "/admin",
-    idName: "adminId",
-    colNames: ["ID", "Username", "Password"],
-    listName: "list",
-    tableHeader: "Admin Manage",
-    // ------------------------
-    // Modal Form content
-    // ------------------------
-    modalHeader: "Add a new admin",
-    labelNames: ["Username", "Password"],
-    dataNames: ["username", "password"],
-    descriptor: {
-      username: [
-        Rules.required("Username"),
-        Rules.isLength(3, 10, "Username"),
-        Rules.isType(Rules.TYPE.string),
-        Rules.isDuplicate("/admin/username-duplication", "username"),
-      ],
-      password: [Rules.required("password"), Rules.isLength(3, 10)],
-    },
-  };
-  */
 export default class extends Component {
   static defaultProps = {};
   state = {
@@ -82,9 +33,9 @@ export default class extends Component {
    */
   updateTable = async () => {
     const { url } = this.props;
-    await getList(url).then((list) => {
+    getList(url).then((list) => {
       this.setState({ list });
-      console.log(list);
+      // console.log(list);
     });
   };
   /**
@@ -93,14 +44,9 @@ export default class extends Component {
  *
  * @memberof EditTable
  */
-  componentWillMount() {
-    this.props.onRef(this);
+  componentDidMount() {
     this.updateTable();
   }
-  handleEdit = (id) => {
-    tableEditAction(id, this);
-  };
-
   handleChange = (id, key, value) => {
     const { list } = this.state;
     const { idName } = this.props;
@@ -125,7 +71,6 @@ export default class extends Component {
       this.updateTable();
     });
   };
-  handleUpdate = () => {};
 
   handleCheck = (data, id) => {
     const { list } = this.state;
@@ -156,95 +101,59 @@ export default class extends Component {
 
     this.updateTable();
   };
-
-  get FormProps() {
-    const { Admin } = Api;
-    return {
-      dispatch: async (type, payload) => {
-        switch (type) {
-          case "update":
-            await updateOne(Admin, payload);
-            break;
-          case "create":
-            await createOne(payload);
-            break;
-          default:
-            break;
-        }
-        this.updateTable();
-      },
-      updateTable: this.updateTable,
-      fieldValidate: async (descriptor, dataName, value) => {
-        let validator = new schema(descriptor);
-        return validator
-          .validate({ [dataName]: value })
-          .then(() => {
-            return null;
-          })
-          .catch(({ errors, fields }) => {
-            return {
-              content: fields[dataName][0]["message"],
-              pointing: "below",
-            };
-          });
-      },
-
-      updateField: (e, state, setState) => {
-        console.log("====================================");
-        console.log(setState);
-        console.log("====================================");
-        setState({
-          ...state,
-          [e.target.name]: e.target.value,
-        });
-      },
-      getErrorProp: (dataKey, state) => {
-        return state["errMsg"][dataKey];
-      },
-      updateFormMsg: (dataKey, newMsg, state, setState) => {
-        const msg = state.errMsg;
-        msg[dataKey] = newMsg;
-        setState({ ...state, errMsg: msg });
-      },
-    };
-  }
+  handleRefresh = () => {
+    this.updateTable();
+  };
+  dispatch = async (type, payload, api) => {
+    switch (type) {
+      case "update":
+        await updateOne(api, payload);
+        break;
+      case "create":
+        await createOne(api, payload);
+ 
+        break;
+      default:
+        break;
+    }
+    this.updateTable();
+  };
   render() {
-    const { list, checkedAll } = this.state;
-    const { idName, colNames, tableHeader, tableColumns } = this.props;
-    const { rowHeight } = this.state;
-    // if(list[0]["isStudent"]!==null){
-    //   console.info(list[0].isStudent)
-    // }
+    const { list, checkedAll, rowHeight } = this.state;
+    const { idName, tableTitle, tableColumns, getFormElement } = this.props;
+    const formProps = {
+      ...oldFormProps,
+      dispatch: this.dispatch,
+    };
 
     return (
       <div>
         <Segment>
           <Header textAlign="center" as="h2">
-            {tableHeader}
+            {tableTitle}
           </Header>
         </Segment>
         <Menu>
-          <Menu.Item
-            onClick={(e) => {
-              const { open } = this.child.state;
-              if (!open) {
-                this.child.setState({ open: true });
-              }
-            }}
-          >
-            <ModalForm
-              {...this.props}
-              onRef={(ref) => {
-                this.child = ref;
-              }}
-              updateTale={this.updateTable}
-            />
+          <Menu.Item>
+            <Modal
+              trigger={<Button>Add</Button>}
+              closeIcon
+              closeOnDimmerClick={false}
+            >
+              {getFormElement("create", formProps)}
+            </Modal>
           </Menu.Item>
           <Menu.Item
             icon="minus"
             as={Button}
             name="Delete Selected"
             onClick={this.handleDeleteSelected}
+          />
+          <Menu.Item
+            icon="redo"
+            as={Button}
+            name=""
+            onClick={this.handleRefresh}
           />
         </Menu>
 
@@ -269,8 +178,19 @@ export default class extends Component {
           {tableColumns}
           <Column width={100} sort="true" resizable align="center">
             <HeaderCell>Edit</HeaderCell>
-            {/* <EditActionCell dataKey={idName} onClick={this.handleEdit} /> */}
-            <AdminFormCell type="update" {...this.FormProps} />
+            <Cell>
+              {(rowData, rowIndex) => {
+                return (
+                  <Modal
+                    trigger={<Button>Edit</Button>}
+                    closeIcon
+                    closeOnDimmerClick={false}
+                  >
+                    {getFormElement("update", formProps, rowData)}
+                  </Modal>
+                );
+              }}
+            </Cell>
           </Column>
           <Column width={100} sort="true" resizable align="center">
             <HeaderCell>Delete</HeaderCell>
@@ -282,127 +202,6 @@ export default class extends Component {
   }
 }
 
-const AdminFormCell = ({ rowData, type, ...props }) => {
-  // TODO: finish the reconstrction of ModalForm including update data and create data
-
-  return (
-    <Cell {...props}>
-      <Modal trigger={<Button>Edit</Button>}>
-        <AdminForm rowData={rowData} type={type} props={props} />
-      </Modal>
-    </Cell>
-  );
-};
-const AdminForm = ({ rowData, type, props }) => {
-  const FormField = Form.Field;
-
-  const adminId = rowData["adminId"],
-    dispatch = props["dispatch"],
-    updateField = props["updateField"],
-    fieldValidate = props["fieldValidate"],
-    getErrorProp = props["getErrorProp"],
-    updateFormMsg = props["updateFormMsg"];
-
-  const [state, setState] = useState({
-    adminId: adminId,
-    username: rowData["username"],
-    password: rowData["password"],
-    errMsg: {},
-  });
-  // TODO: 继续封装！
-  const usernameField = () => {
-    // const descriptor = {
-    //   username: [Rules.required("username")],
-    // };
-    // const dataKey = "username";
-    // const title = "Username";
-    // const placeholder = "Fuck you";
-    // const initVal = state.username;
-    // const props={}
-
-    const formProps = {
-      descriptor: {
-        username: [Rules.required("username")],
-      },
-      dataKey: "username",
-      title: "Username",
-      placeholder: "Fuck you",
-      initVal: state.username,
-      state,
-      setState,
-    };
-    return (
-      <FormFieldInput methods={props} formProps={formProps} />
-    );
-  };
-  const passwordField = () => {
-    return (
-      <FormField>
-        <label>Password</label>
-        <Input
-          onBlur={() => {
-            // validator
-            //   .validate(state)
-            //   .then(async () => {})
-            //   .catch(({ errors, fields }) => {
-            //     console.log("====================================");
-            //     console.log(errors);
-            //     console.log("====================================");
-            //   });
-          }}
-          name="password"
-          placeholder="Password"
-          value={state.password}
-          onChange={updateField}
-        />
-      </FormField>
-    );
-  };
-
-  return (
-    <Form>
-      {usernameField()}
-
-      <Button
-        type="submit"
-        onClick={() => {
-          dispatch(type, state);
-        }}
-      >
-        Ok
-      </Button>
-    </Form>
-  );
-};
-const FormFieldInput = ({ methods, formProps, ...props }) => {
-  const { getErrorProp, fieldValidate, updateFormMsg, updateField } = methods;
-  const {
-    title,
-    initVal,
-    state,
-    setState,
-    placeholder,
-    dataKey,
-    descriptor,
-  } = formProps;
-  return (
-    <FormField
-      control={Input}
-      label={title}
-      placeholder={placeholder}
-      value={initVal}
-      onChange={(e) => {
-        updateField(e, state, setState);
-      }}
-      name={dataKey}
-      error={getErrorProp(dataKey, state)}
-      onBlur={async (e) => {
-        const newMsg = await fieldValidate(descriptor, dataKey, state[dataKey]);
-        updateFormMsg(dataKey, newMsg, state, setState);
-      }}
-    />
-  );
-};
 // class table extends Component {
 //   componentWillMount() {}
 

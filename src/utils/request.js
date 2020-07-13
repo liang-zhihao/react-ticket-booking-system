@@ -1,7 +1,8 @@
 import axios from "axios";
 import { getTokenHeader, setToken, getToken } from "utils/token";
 import Alert from "components/public/Alert";
-const BASE_URL = "http://localhost:8090/api";
+// export const BASE_URL = "http://localhost:8090/api";
+export const BASE_URL = "http://46.137.237.243:8090/api";
 let headers = getTokenHeader();
 var instance = axios.create({
   baseURL: BASE_URL,

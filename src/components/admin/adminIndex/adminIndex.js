@@ -5,12 +5,12 @@ import { Provider, connect } from "react-redux";
 import { Link, Switch, Route, NavLink, Redirect } from "react-router-dom";
 import { Grid, Menu, Sidebar, Segment, Table, Button } from "semantic-ui-react";
 import AdminSidebar from "./adminSidebar";
-import AdminTable from "components/admin/tables/adminTable";
-import FilmTable from "../tables/filmTable";
-import OrderTable from "../tables/orderTable";
+import AdminTable from "components/admin/admin/adminTable";
+import FilmTable from "../film/filmTable";
+import OrderTable from "../order/orderTable";
 import SessionTable from "../tables/sessionTable";
-import UserTable from "../tables/userTable";
-import CinemaTable from "../tables/cinemaTable";
+import UserTable from "../user/userTable";
+import CinemaTable from "../cinema/cinemaTable";
 import CommentTable from "components/admin/tables/commentTable.js";
 export default class AdminIndex extends Component {
   // carefully check Menu.Item and Menu.item
