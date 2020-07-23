@@ -2,7 +2,7 @@ import DeleteActionCell from "components/table/components/DeleteActionCell";
 import React, { Component } from "react";
 import { Cell, Column, HeaderCell, Table } from "rsuite-table";
 import "rsuite-table/dist/css/rsuite-table.css";
-import { Button, Form, Header, Modal, Segment } from "semantic-ui-react";
+import { Button, Form, Header, Modal, Segment, Icon } from "semantic-ui-react";
 import Api from "utils/api";
 import { getList, createOne, deleteOne, updateOne } from "utils/request";
 import OrderForm from "./OrderForm";
@@ -236,20 +236,6 @@ class OrderTable extends Component {
           );
         }}
       >
-        {/* checked: false
-cinema: null
-editable: false
-fee: 11111
-film: {filmId: 18, typeId: 5, name: "www", director: "12312", introduction: "123123sdf", …}
-orderId: 1
-orderTime: "2020-04-27 17:39"
-payTime: "2020-04-29 17:39"
-room: {roomId: 5, cinemaId: 7, seats: 50, roomName: "E"}
-session: {sessionId: 5, filmId: 18, time: "2020-07-10 08:30", status: null, remainingSeats: 450, …}
-sessionId: 5
-status: ""
-user: {username: "liang", email: "347733121@qq.com", password: "123", tel: "2223", isStudent: 1, …}
-userId: 1 */}
         <Column width={100} align="center">
           <HeaderCell>#</HeaderCell>
           <ExpandCell
@@ -291,14 +277,15 @@ const ExpandCell = ({
   ...props
 }) => (
   <Cell {...props}>
-    <Button
+    <Button basic
       size="xs"
       onClick={() => {
         onChange(rowData);
       }}
-    >
-      {expandedRowKeys.some((key) => key === rowData[rowKey]) ? "-" : "+"}
-    </Button>
+      icon=    {expandedRowKeys.some((key) => key === rowData[rowKey]) ? "minus square" : "plus square"}
+     
+    />
+ 
   </Cell>
 );
 export default OrderTable;

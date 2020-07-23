@@ -8,10 +8,10 @@ import AdminSidebar from "./adminSidebar";
 import AdminTable from "components/admin/admin/adminTable";
 import FilmTable from "../film/filmTable";
 import OrderTable from "../order/orderTable";
-import SessionTable from "../tables/sessionTable";
+import SessionTable from "../session/sessionTable";
 import UserTable from "../user/userTable";
 import CinemaTable from "../cinema/cinemaTable";
-import CommentTable from "components/admin/tables/commentTable.js";
+
 export default class AdminIndex extends Component {
   // carefully check Menu.Item and Menu.item
   state = {
@@ -54,10 +54,10 @@ export default class AdminIndex extends Component {
                   />
                   <Route path="/admin/film-manage" component={FilmTable} />
                   <Route path="/admin/cinema-manage" component={CinemaTable} />
-                  <Route
+                  {/* <Route
                     path="/admin/comment-manage"
                     component={CommentTable}
-                  />
+                  /> */}
                   <Route path="/admin/user-manage" component={UserTable} />
                 </Switch>
               </Sidebar.Pusher>
