@@ -34,12 +34,12 @@ class LoginForm extends Component {
   };
   submit() {
     const { proof, password } = this.state;
-    const {saveUserId}=this.props
+    const { saveUserId } = this.props;
     const params = { proof, password };
     auth(params).then((res) => {
-      console.log(`UserId is ${res["data"]["userId"]}`)
-      saveUserId(res["data"]["userId"])
-      setTimeout(this.props.history.replace("/index"), 1000);
+      console.log(`UserId is ${res["data"]["userId"]}`);
+      saveUserId(res["data"]["userId"]);
+      setTimeout(this.props.history.replace("/"), 1000);
     });
   }
   render() {

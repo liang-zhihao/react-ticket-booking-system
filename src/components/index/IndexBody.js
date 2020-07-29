@@ -1,20 +1,8 @@
-import PropTypes from "prop-types";
 import React, { Component } from "react";
-import axios from "axios";
-import { Provider, connect } from "react-redux";
-import { Link, Switch, Route, NavLink, Redirect } from "react-router-dom";
-import {
-  Grid,
-  Icon,
-  Image,
-  Menu,
-  Input,
-  Card,
-  Rating,
-  Placeholder,
-} from "semantic-ui-react";
-import { getList, updateOne, deleteOne, createOne } from "utils/request";
-import {getPlaceHolder} from "utils/placeHolder"
+import { Link } from "react-router-dom";
+import { Card, Grid, Image, Rating } from "semantic-ui-react";
+import { getPlaceHolder } from "utils/placeHolder";
+import { getList } from "utils/request";
 export default class IndexBody extends Component {
   state = {
     filmList: [],
@@ -80,12 +68,7 @@ class FilmCard extends Component {
           <Card.Content>{filmData.name}</Card.Content>
           {/* {this.props.name} */}
         </Link>
-        <Rating
-          defaultRating={3}
-          onRate={this.handleOnRate}
-          maxRating={5}
-          icon="star outline"
-        ></Rating>{" "}
+ 
       </Card>
     );
   }

@@ -32,7 +32,7 @@ export default class TopMenu extends Component {
             <Menu>
               {/* <span>Logo</span> */}
 
-              <NavLink to="/index">
+              <NavLink to="/">
                 <Menu.Item
                   icon="home"
                   name="Index"

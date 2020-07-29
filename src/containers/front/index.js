@@ -4,19 +4,20 @@ import axios from "axios";
 import { Provider, connect } from "react-redux";
 import { Link, Switch, Route, NavLink, Redirect } from "react-router-dom";
 import { Grid } from "semantic-ui-react";
-import Login from "components/user/login/login";
-import Register from "components/user/register/register";
+
 import { getList, updateOne, deleteOne, createOne } from "utils/request";
-import TopMenu from "../public/TopMenu";
-import IndexBody from "./IndexBody";
+import TopMenu from "../../components/public/TopMenu";
+import IndexBody from "../../components/index/IndexBody";
 import FilmDetail from "components/film/FilmDetail.js";
-import Profile from "../user/profile/profile";
-import OrderDetail from "components/order/orderDetail"
+import Profile from "../../components/user/profile/profile";
+import OrderDetail from "components/order/orderDetail";
 import { isTokenNull } from "utils/token";
-import SessionDetail from 'components/session/sessionDetail'
+import SessionDetail from "components/session/sessionDetail";
 import PrivateRoute from "Route/PrivateRoute";
 class Index extends Component {
   render() {
+
+
     return (
       <Grid>
         <Grid.Row>
@@ -27,13 +28,15 @@ class Index extends Component {
         <Grid.Row>
           <Grid.Column width={16}>
             <Switch>
-              <Route exact path="/register" component={Register} />
               <PrivateRoute exact path="/profile" component={Profile} />
-              <Route exact path="/login" component={Login} />
               <PrivateRoute exact path="/film/:id" component={FilmDetail} />
-              <PrivateRoute exact path="/session/:id" component={SessionDetail} />
-              <PrivateRoute  path="/index" component={IndexBody} />
-              <PrivateRoute  path="/" component={IndexBody} />
+              <PrivateRoute
+                exact
+                path="/session/:id"
+                component={SessionDetail}
+              />
+              {/* <PrivateRoute  path="/index" component={IndexBody} />*/}
+              <PrivateRoute path="/" component={IndexBody} />
               {/* TODO test area */}
             </Switch>
           </Grid.Column>

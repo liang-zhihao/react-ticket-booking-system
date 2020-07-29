@@ -1,17 +1,9 @@
-import PropTypes from "prop-types";
+import Tables from "components";
 import React, { Component } from "react";
-import axios from "axios";
-import { Provider, connect } from "react-redux";
-import { Link, Switch, Route, NavLink, Redirect } from "react-router-dom";
-import { Grid, Menu, Sidebar, Segment, Table, Button } from "semantic-ui-react";
-import AdminSidebar from "./adminSidebar";
-import AdminTable from "components/admin/admin/adminTable";
-import FilmTable from "../film/filmTable";
-import OrderTable from "../order/orderTable";
-import SessionTable from "../session/sessionTable";
-import UserTable from "../user/userTable";
-import CinemaTable from "../cinema/cinemaTable";
-
+import { Route, Switch } from "react-router-dom";
+import { Button, Grid, Menu, Sidebar } from "semantic-ui-react";
+import AdminSidebar from "components/admin/adminIndex/adminSidebar";
+import AdminIndexBody from "containers/admin/components/indexBody"
 export default class AdminIndex extends Component {
   // carefully check Menu.Item and Menu.item
   state = {
@@ -29,7 +21,6 @@ export default class AdminIndex extends Component {
     const minHeight = document.body.clientHeight + "px";
     let windowHeight = { minHeight: minHeight };
 
-
     return (
       <Sidebar.Pushable>
         <Grid columns={1}>
@@ -44,21 +35,41 @@ export default class AdminIndex extends Component {
                     onClick={this.handleClick.bind(this)}
                   />
                 </Menu>
-
                 <Switch>
-                  <Route path="/admin/admin-manage"  component={AdminTable} />
-                  <Route path="/admin/order-manage" component={OrderTable} />
+            
+           
+                  <Route
+                    path="/admin/admin-manage"
+                    component={Tables.AdminTable}
+                  />
+                  <Route
+                    path="/admin/order-manage"
+                    component={Tables.OrderTable}
+                  />
                   <Route
                     path="/admin/session-manage"
-                    component={SessionTable}
+                    component={Tables.SessionTable}
                   />
-                  <Route path="/admin/film-manage" component={FilmTable} />
-                  <Route path="/admin/cinema-manage" component={CinemaTable} />
+                  <Route
+                    path="/admin/film-manage"
+                    component={Tables.FilmTable}
+                  />
+                  <Route
+                    path="/admin/cinema-manage"
+                    component={Tables.CinemaTable}
+                  />
                   {/* <Route
                     path="/admin/comment-manage"
                     component={CommentTable}
                   /> */}
-                  <Route path="/admin/user-manage" component={UserTable} />
+                  <Route
+                    path="/admin/user-manage"
+                    component={Tables.UserTable}
+                  />
+                   <Route
+                    path="/admin" exact
+                    component={AdminIndexBody}
+                  />
                 </Switch>
               </Sidebar.Pusher>
             </Grid.Column>

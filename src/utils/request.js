@@ -12,7 +12,7 @@ var instance = axios.create({
 // "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaWFuZyIsImV4cCI6MTU4NzIyNDM0NSwiaWF0IjoxNTg3MjE3MTQ1fQ.GvHmecWhnJSQp5pq9ccGLOok1DmYle55u3k7ZcJSvyJJAfb9BZushjvKa6vEdwLQvcmIBpKu0QrINUZIkvD_rQ"
 /**
  * get list from back end
- * 
+ *
  * @param  {String} url ("api/user")
  */
 export async function getList(url) {
@@ -99,7 +99,7 @@ export async function getOne(url) {
 }
 /**
  * @param  {Object} params :{ proof : liang , password :1234}
- * @returns {String} accessToken 
+ * @returns {String} accessToken
  *  use toke to access any resource
  */
 export async function auth(params) {
@@ -107,7 +107,7 @@ export async function auth(params) {
     .post(BASE_URL + "/auth", params)
     .then((res) => {
       setToken(res.data.data["accessToken"]);
-      console.log("successfully login, token is "+ getToken() );
+      console.log("successfully login, token is " + getToken());
       return res.data;
     })
     .catch((err) => {
@@ -131,4 +131,19 @@ export async function getUserByTokenApi(params) {
       console.error(err);
     });
   return res;
+}
+// @return {Integer} count
+export async function getCount(url) {
+  let response = await instance
+    .get(url + "/count")
+    .then((res) => {
+      console.log(res);
+
+      return res.data.data;
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+
+  return response;
 }

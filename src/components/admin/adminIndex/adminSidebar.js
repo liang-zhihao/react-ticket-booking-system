@@ -18,6 +18,9 @@ class AdminSidebar extends Component {
         icon="labeled"
         visible={visible}
       >
+        <NavLink to="/admin">
+          <Menu.Item icon="home" name="Index"></Menu.Item>
+        </NavLink>
         <NavLink to="/admin/user-manage">
           <Menu.Item icon="users" name="User Manage"></Menu.Item>
         </NavLink>
